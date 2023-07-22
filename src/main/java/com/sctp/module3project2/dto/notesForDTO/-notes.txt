@@ -1,0 +1,73 @@
+
+
+DTO - DataTransferObject - https://www.baeldung.com/java-dto-pattern#How%20to%20Use%20It?
+
+    DTOs or Data Transfer Objects are objects that carry data between processes in order to reduce the number of methods calls.
+
+    DTOs normally are created as POJOs. They are flat data structures that contain no business logic. They only contain storage,
+    accessors and eventually methods related to serialization or parsing.
+
+Difference between Entity and DTO - https://stackoverflow.com/questions/39397147/difference-between-entity-and-dto
+
+    DTO stands for Data Transfer Object. DTOs are mainly used for transferring data between services (web services, APIs, etc.) 
+        which can encompass variety of properties of different entities (with or without their ID). 
+        Take this row as an example of a DTO: Consider that a shopping website is going to send its shipping requests to a shipping company by a web-service.
+        Its DTO would be something like this: CustomerFullName, ShippingFee, ShippingAddress. 
+        
+        In this example CustomerFullName is combination of properties FirstName + LastName for the Customer entity, 
+        and ShippingFee is the result of several processes of destination, tax, etc over some other entities.
+
+    On the contrary, Entities are bunch of properties gathered to represent a single entity with a specific ID (e.g., Teacher, Student, Employee, etc.).
+    In other words, DTOs are a bunch of meaningless properties gathered to be sent to the client and a DTO doesn't necessarily have relationship to the other DTOs, 
+    while an Entity includes properties of a specific object with meaningful relation to the other entities. 
+    In a relational database paradigm, we can look at DTOs as views' row while Entities are tables' row with the primary key. 
+
+    However, Model is a combination of these two. A model can contain several related entities plus extra data to handle real-world application/UI problems. Consider a Model named CustomerOrdersModel that contains Customer Entity, List<Order> Entities, and an extra Boolean flag PayWithCredit specifying whether user is going to pay with debit-card or credit-card.
+    
+    Entity is class mapped to table. Dto is class mapped to "view" layer mostly. What needed to store is entity & which needed to 'show' on web page is DTO.
+    Example : If I want to store employee model as follows :  
+        Take employee as an example, I need to store gender either male/female/other. 
+        But on JSP I need to show all three values as form 'options' so user can select one.
+
+    What fields should the DTOs have? For example my entity classes are:
+
+    @Entity
+    public class MyFirstEntity implements Serializable {
+
+        @Id @GeneratedValue
+        private Long id;
+        private String stringData;
+
+        @OneToOne
+        private MySecondEntity mySecondEntity;
+
+        @OneToMany
+        private List<MySecondEntity> mySecondEntitesList;
+
+    }
+
+    @Entity
+    public class MySecondEntity implements Serializable {
+        @Id @GeneratedValue
+        private Long id;
+        private Integer integerData;
+
+        @ManyToOne
+        private MyFirstEntity myFirstEntity;
+
+    }
+    
+    There is a one-sided connection (One-to-one) and a two-sided connection (Many-to-one), a simple String and Integer data and of course the ids.
+    What to put from them in the MyFirstDTO and MySecondDTO classes?
+    
+    If there is an inheritance between the entities, then how should I represent it in the DTOs? For example:
+
+    @Entity
+    public class MyFirstEntity extends MySecondEntity {
+        ....
+    }
+
+    @Entity
+    public class MyFirstDTO extends MySecondDTO {
+        ....
+    }

@@ -1,0 +1,71 @@
+package com.sctp.module3project2;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import com.sctp.module3project2.controllers.BerthCtrl;
+import com.sctp.module3project2.entities.Berth;
+import com.sctp.module3project2.services.BerthSvc;
+
+@SpringBootTest
+class HarbourBookingSystemApplicationTests {
+
+	// @Test
+	// void contextLoads() {
+	// }
+
+	@Mock
+	private BerthSvc service;
+
+	@InjectMocks
+	private BerthCtrl controller;
+
+	@BeforeEach
+	void setUp() {
+		MockitoAnnotations.openMocks(this);
+	}
+
+	@Test
+	void getAllBerthPortLocations_ReturnsListOfBerth() {
+		List<Berth> berths = new ArrayList<>();
+		berths.add(new Berth("Berth 1"));
+		berths.add(new Berth("Berth 2"));
+
+		when(service.getAllBerthPortLocations()).thenReturn(berths);
+
+		List<Berth> result = controller.getAllBerthPortLocations();
+
+		assertEquals(2, result.size());
+		verify(service, times(1)).getAllBerthPortLocations();
+	}
+
+	@Test
+	void createBerthPortLocation_ReturnsCreatedBerth() {
+		Berth berth = new Berth("Berth 1");
+		Berth createdBerth = new Berth(1L, "Berth 1");
+
+		when(service.createBerthPortLocation(berth)).thenReturn(createdBerth);
+
+		ResponseEntity<Berth> response = controller.createBerthPortLocation(berth);
+
+		assertEquals(HttpStatus.CREATED, response.getStatusCode());
+		assertEquals(createdBerth, response.getBody());
+		verify(service, times(1)).createBerthPortLocation(berth);
+	}
+
+	// Write more unit tests for other controller methods
+}

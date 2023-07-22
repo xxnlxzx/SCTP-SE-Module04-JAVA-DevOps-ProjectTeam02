@@ -1,0 +1,99 @@
+package com.sctp.module3project2.controller;
+
+import java.util.List;
+import java.util.Optional;
+
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.sctp.module3project2.entity.ShippingRoute;
+import com.sctp.module3project2.exception.ShippingRouteNotFoundException;
+import com.sctp.module3project2.repository.BerthRepository;
+import com.sctp.module3project2.repository.ShippingRouteRepository;
+// Updated by Wei Kang
+
+@RestController
+@RequestMapping("/shippingroute")
+public class ShippingRouteController {
+    
+    @Autowired ShippingRouteRepository SRrepo;
+
+    @Autowired BerthRepository BerthRepo;
+    
+    @PostMapping("")
+    public ResponseEntity<ShippingRoute> createCustomer(@Valid @RequestBody ShippingRoute route) {
+
+        ShippingRoute createRoute = SRrepo.save(route);
+        return new ResponseEntity<>(createRoute, HttpStatus.CREATED);
+
+    }
+
+    // @PostMapping(value = "/shippingroute")
+    // public ResponseEntity<ShippingRoute> createShippingRoute(@Valid @RequestBody ShippingRoute route){
+    //     ShippingRoute createRoute = SRrepo.save(route);
+    //     return ResponseEntity.ok(createRoute);
+    // }
+
+    @GetMapping(value = "")
+    public ResponseEntity<List<ShippingRoute>>listShippingRoute(){
+        List<ShippingRoute> shippingRoute = SRrepo.findAll();
+        return ResponseEntity.ok(shippingRoute);
+    }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<Optional<ShippingRoute>> getShippingRoute(@PathVariable int id){
+        Optional<ShippingRoute> result = (Optional<ShippingRoute>) SRrepo.findById(id);
+        if (result.isPresent()){
+            return ResponseEntity.ok(result);
+        } else{
+            throw(new ShippingRouteNotFoundException("Shipping Route does notnot exist with id: " + id));
+            // return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<HttpStatus> deleteShippingRoute(@PathVariable int id){
+        SRrepo.deleteById(id);
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<ShippingRoute> updateShippingRoute(@PathVariable int id, @RequestBody ShippingRoute route){
+        ShippingRoute updateShipping = SRrepo.findById(id)
+                .orElseThrow(() -> new ShippingRouteNotFoundException("Employee not exist with id: " + id));
+        // Optional<ShippingRoute> result = (Optional<ShippingRoute>) SRrepo.findById(id);
+        updateShipping.setDate_of_arrival(route.getDate_of_arrival());
+        updateShipping.setPort(route.getPort());
+        updateShipping.setPurpose_of_travel(route.getPurpose_of_travel());
+        updateShipping.setTax_fees_port_expenses(route.getTax_fees_port_expenses());
+        ShippingRoute createRoute = SRrepo.save(updateShipping);
+        return ResponseEntity.ok(createRoute);
+    }
+
+
+    // Testing Many to one using Berth as vessels is not yet updated
+    // @GetMapping(value = "/berth/{id}")
+    // public ResponseEntity<ShippingRoute> GetBerth(@PathVariable Long id, @Valid @RequestBody ShippingRoute route){
+    //     Optional<Berth> result = (Optional<Berth>) BerthRepo.findById(id);
+    //     if (result.isPresent()){
+    //         route.setBerth(result.get());
+    //         ShippingRoute createRoute = SRrepo.save(route);
+    //         return ResponseEntity.ok(createRoute);
+    //     } else{
+    //         throw(new ShippingRouteNotFoundException("Shipping Route does notnot exist with id: " + id));
+    //         // return ResponseEntity.notFound().build();
+    //     }
+    // }
+    
+}

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+// import org.springframework.web.util.HtmlUtils;
 
 import com.sctp.module3project2.entity.Userid;
 import com.sctp.module3project2.services.UseridService;
@@ -21,12 +22,12 @@ import com.sctp.module3project2.services.UseridService;
 public class UseridController {
     private UseridService useridService;
 
-    public UseridController(UseridService useridService){
+    public UseridController(UseridService useridService) {
         this.useridService = useridService;
     }
 
     @PostMapping("")
-    public ResponseEntity<Userid> saveUserid(@RequestBody Userid userid){
+    public ResponseEntity<Userid> saveUserid(@RequestBody Userid userid) {
         Userid newUserid = useridService.saveUserid(userid);
         return new ResponseEntity<>(newUserid, HttpStatus.CREATED);
     }
@@ -37,31 +38,44 @@ public class UseridController {
         return new ResponseEntity<>(allUserid, HttpStatus.OK);
     }
 
-    // @GetMapping("/{userid}")
-    // public ResponseEntity<Userid> getUseridByUserid(@PathVariable String userid) {
-    //     Userid foundUserid = useridService.findUserByUserID(userid);
-    //     return new ResponseEntity<>(foundUserid,HttpStatus.OK);
-    // }
-    @GetMapping("/password/{userid}")
-    public ResponseEntity<String> findPassWordByUserID(@PathVariable String userid) {
-        String foundPassword = useridService.findPassWordByUserID(userid);
-        return new ResponseEntity<>(foundPassword,HttpStatus.OK);
+    @GetMapping("/{userid}")
+    public ResponseEntity<Userid> getUseridByUserid(@PathVariable String userid) {
+        Userid foundUserid = useridService.findUserByUserID(userid);
+        return new ResponseEntity<>(foundUserid, HttpStatus.OK);
     }
-    
+
+    // Vulnerabilities.
+    // @GetMapping("/password/{userid}")
+    // public ResponseEntity<String> findPassWordByUserID(@PathVariable String
+    // userid) {
+    // String foundPassword = useridService.findPassWordByUserID(userid);
+    // return new ResponseEntity<>(foundPassword,HttpStatus.OK);
+    // }
+
+    // Remediate vulnerabilities.
+    // @GetMapping("/password/{userid}")
+    // public ResponseEntity<String> findPasswordByUserID(@PathVariable String
+    // userid) {
+    // String foundPassword = useridService.findPasswordByUserID(userid);
+    // // Properly escape the foundPassword to prevent XSS attacks
+    // String sanitizedPassword = HtmlUtils.htmlEscape(foundPassword);
+    // return new ResponseEntity<>(sanitizedPassword, HttpStatus.OK);
+    // }
+
     @GetMapping("/{id}")
-    public ResponseEntity<Userid> getUseridById(@PathVariable int id){
+    public ResponseEntity<Userid> getUseridById(@PathVariable int id) {
         Userid getUserid = useridService.findUserIdById(id);
         return new ResponseEntity<>(getUserid, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteUserById(@PathVariable int id){
+    public ResponseEntity<HttpStatus> deleteUserById(@PathVariable int id) {
         useridService.deleteUserid(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Userid> updateUserid(@PathVariable int id, @RequestBody Userid userid){
+    public ResponseEntity<Userid> updateUserid(@PathVariable int id, @RequestBody Userid userid) {
         Userid newUserid = useridService.updateUserid(id, userid);
         return new ResponseEntity<>(newUserid, HttpStatus.OK);
     }

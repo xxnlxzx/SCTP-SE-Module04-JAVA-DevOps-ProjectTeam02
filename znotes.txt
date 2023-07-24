@@ -1,0 +1,56 @@
+Links of my setup for windows:
+
+Install Maven on Windows : https://phoenixnap.com/kb/install-maven-windows
+
+------------------------------------------------------------------------------------------------
+
+Error notes:
+    Terminal:
+        Error: JAVA_HOME not found in your environment.
+        Please set the JAVA_HOME variable in your environment to match the location of your Java installation.
+    
+    Solutions:
+        1. Find the location where Java is installed on your system. This is typically under "C:\Program Files\Java\jdkx.x.x_x" for Windows.
+
+        2. Set the JAVA_HOME environment variable:
+            Right-click on "This PC" or "My Computer" and select "Properties."
+            Go to "Advanced system settings."
+            Click on the "Environment Variables" button.
+            Under the "System Variables" section, click on "New."
+            Set the variable name as "JAVA_HOME" and the variable value as the path to your Java installation (e.g., "C:\Program Files\Java\jdkx.x.x_x").
+            Click "OK" to save the changes.
+
+        Close and reopen any terminal windows to apply the changes.
+
+        After setting the JAVA_HOME environment variable, try running the original command again:
+
+            "c:\Users\Aanlo\Documents\Module04-IntroToDevOps\SCTP-SE-Module04-JAVA-DevO
+
+------------------------------------------------------------------------------------------------
+
+Docker Build Container:
+    Terminal:
+        ' docker build -t module04-project . '
+
+Docker Run Container:
+    Terminal:
+        ' docker run -d -p 8000:8080 module04-project '
+
+Docker Remove Container:
+    Terminal:
+        ' docker rm -f <container ID> '
+
+
+------------------------------------------------------------------------------------------------
+
+Snyk Install on Windows:
+    Terminal:
+        ' curl https://static.snyk.io/cli/latest/snyk-win.exe -o snyk.exe '
+
+        ' npm install -g snyk '
+
+        ' snyk auth '
+
+        ' snyk test '
+
+-------------------------------------------------------------------------------------------------

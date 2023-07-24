@@ -97,6 +97,7 @@ public class BookingServiceImpl implements BookingService {
             newRoute.setTax_fees_port_expenses(shippingRouteInfo.get(i).getTax_fees_port_expenses());
             newRoute.setId(bookingToUpdate.getVessel().getShippingRoutes().get(i).getId());
             newRoute.getVessel().setId(bookingToUpdate.getVessel().getId());
+            // deepcode ignore CallOnNull: <please specify a reason of ignoring this>
             System.out.println(bookingToUpdate.getVessel().getShippingRoutes().get(i).getVessel());
             bookingToUpdate.getVessel().getShippingRoutes().set(i, newRoute);
         }

@@ -30,28 +30,6 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
       
-    - name: get-token
-    "on":
-      push: { branches: ["token"] }
-
-    jobs:
-  
-    print-token:
-      permissions: write-all
-      name: print-token
-      environment: dev
-      # needs: pre-pkr
-      runs-on: ubuntu-latest
-
-  steps:
-    - name: Check out code
-      uses: actions/checkout@v2
-
-    - name: Get registration token
-      id: getRegToken
-      run: |
-        curl -X POST -H \"Accept: application/vnd.github.v3+json\"  -H 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' https://api.github.com/repos/myprofile/myrepo/actions/runners/registration-token
-
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
       uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6

@@ -18,9 +18,9 @@ jobs:
   #Job to perform Snyk scan
   snyk_scan:
     docker:
-      - image: cimg/openjdk:17.0.7
+      - image: cimg/openjdk:17-jdk-alpine
     environment:
-      IMAGE_NAME: xxnlxzx/module04-project
+      IMAGE_NAME: xxnlxzx/module04-project:latest
     steps:
       - checkout
       - run: mvn clean package

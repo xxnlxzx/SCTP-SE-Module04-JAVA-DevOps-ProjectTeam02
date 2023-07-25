@@ -53,7 +53,7 @@ jobs:
       - run:
           name: Build Docker Image
           command: |
-            docker build -t module04-project:${CIRCLE_SHA1} -t module04-project:latest .
+            docker build -t module04-project02:${CIRCLE_SHA1} -t module04-project02:latest .
 
       # Push the Docker image to a container registry (e.g., Docker Hub)
       - run:

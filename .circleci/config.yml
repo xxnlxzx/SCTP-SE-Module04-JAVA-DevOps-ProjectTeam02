@@ -49,10 +49,10 @@ jobs:
       # Run Snyk security scan
       - run:
           name: Install Snyk
-          command: npm install -g snyk  # Install snyk globally
+          command: npm install -g snyk --prefix=/home/circleci/.npm-global  # Install snyk globally
       - run:
           name: Snyk Security Scan
-          command: snyk test
+          command: npx snyk test
 
   cd:
     executor: docker-executor

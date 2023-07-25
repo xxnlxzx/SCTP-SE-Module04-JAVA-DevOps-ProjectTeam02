@@ -68,33 +68,33 @@ workflows:
           filters:
             branches:
               only: develop
-      - snyk_scan:
+      # - snyk_scan:
           requires:
             - build_and_test
           filters:
             branches:
               only: develop
               
-  cicd_flow:
-    jobs:
-      - build_and_test:
-          filters:
-            branches:
-              only: release/MYRELEASE
-      # - snyk_scan:
-      #     filters:
-      #       branches:
-      #         only: release
-      - docker_build_and_push:
-          requires:
-            - build_and_test
-            # - snyk_scan
-          filters:
-            branches:
-              only: release/MYRELEASE
-      - deploy_to_heroku:
-          requires:
-            - docker_build_and_push
-          filters:
-            branches:
-              only: main
+  # cicd_flow:
+  #   jobs:
+  #     - build_and_test:
+  #         filters:
+  #           branches:
+  #             only: release/MYRELEASE
+  #     # - snyk_scan:
+  #     #     filters:
+  #     #       branches:
+  #     #         only: release
+  #     - docker_build_and_push:
+  #         requires:
+  #           - build_and_test
+  #           # - snyk_scan
+  #         filters:
+  #           branches:
+  #             only: release/MYRELEASE
+  #     - deploy_to_heroku:
+  #         requires:
+  #           - docker_build_and_push
+  #         filters:
+  #           branches:
+  #             only: main

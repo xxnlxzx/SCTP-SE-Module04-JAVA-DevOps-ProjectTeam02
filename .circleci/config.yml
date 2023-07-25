@@ -46,10 +46,15 @@ jobs:
           name: Run Maven Test
           command: mvn test
 
-      # Run Snyk security scan
+      # Authenticate with Snyk
       - run:
-          name: Install Snyk
-          command: npm install -g snyk --prefix=/home/circleci/.npm-global  # Install snyk globally
+          name: Authenticate with Snyk
+          command: echo "$SNYK_TOKEN" | npx snyk auth
+      
+      # Run Snyk security scan
+      # - run:
+      #     name: Install Snyk
+      #     command: npm install -g snyk --prefix=/home/circleci/.npm-global  # Install snyk globally
       - run:
           name: Snyk Security Scan
           command: npx snyk test

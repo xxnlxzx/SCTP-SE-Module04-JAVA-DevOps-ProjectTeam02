@@ -31,7 +31,7 @@ jobs:
   
   # Job to build the Docker image and push to DockerHub
   docker_build_and_push:
-    executor: docker/docker
+    # executor: docker/docker
     docker:
       - image: cimg/openjdk:17.0.7
     steps:
@@ -39,7 +39,6 @@ jobs:
       - run: mvn clean package
       - setup_remote_docker
       - run:
-      
           name: Build and Push Docker Image
           command: |
             docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}

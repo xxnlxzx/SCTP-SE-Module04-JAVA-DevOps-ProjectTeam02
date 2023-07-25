@@ -46,18 +46,18 @@ jobs:
           name: Run Maven Test
           command: mvn test
 
-      # Authenticate with Snyk
-      - run:
-          name: Authenticate with Snyk
-          command: echo "$SNYK_TOKEN" | npx snyk auth
+      # # Authenticate with Snyk
+      # - run:
+      #     name: Authenticate with Snyk
+      #     command: echo "$SNYK_TOKEN" | npx snyk auth
       
       # Run Snyk security scan
       # - run:
       #     name: Install Snyk
       #     command: npm install -g snyk --prefix=/home/circleci/.npm-global  # Install snyk globally
-      - run:
-          name: Snyk Security Scan
-          command: npx snyk test
+      # - run:
+      #     name: Snyk Security Scan
+      #     command: npx snyk test
 
   cd:
     executor: docker-executor

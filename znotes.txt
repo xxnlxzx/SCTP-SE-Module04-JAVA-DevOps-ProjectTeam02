@@ -30,7 +30,7 @@ Error notes:
 
 Docker Build Container:
     Terminal:
-        ' docker build -t module04-project . '
+        ' docker build -t module04-project02 . '
 
 Docker Run Container:
     Terminal:

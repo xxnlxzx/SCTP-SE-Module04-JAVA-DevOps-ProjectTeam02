@@ -8,12 +8,22 @@ executors:
   docker-executor:
     docker:
       - image: cimg/openjdk:17.0.7
+      environment:
+          NODE_VERSION: "14"  # Specify the Node.js version you want
 
 jobs:
   ci:
     executor: docker-executor
     steps:
       - checkout
+      - setup_remote_docker
+
+      # Install Node.js and npm
+      - run:
+          name: Install Node.js and npm
+          command: |
+            curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | sudo -E bash -
+            sudo apt-get install -y nodejs
 
       # Restore dependencies
       - restore_cache:

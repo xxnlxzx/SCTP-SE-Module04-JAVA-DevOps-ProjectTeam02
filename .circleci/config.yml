@@ -3,7 +3,7 @@ orbs:
   docker: circleci/docker@2.2.0
   maven: circleci/maven@1.4.1
   snyk: snyk/snyk@1.4.0
-  
+
 executors:
   docker-executor:
     docker:
@@ -16,14 +16,6 @@ jobs:
     executor: docker-executor
     steps:
       - checkout
-      - setup_remote_docker
-
-      # Install Node.js and npm
-      - run:
-          name: Install Node.js and npm
-          command: |
-            curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | sudo -E bash -
-            sudo apt-get install -y nodejs
 
       # Restore dependencies
       - restore_cache:
@@ -63,6 +55,12 @@ jobs:
     executor: docker-executor
     steps:
       - checkout
+
+      # Persist the JAR file in the workspace
+      - persist_to_workspace:
+          root: ./target
+          paths:
+            - ProjectHarbourBooking-0.0.1-SNAPSHOT.jar
 
       # Install Docker for building and pushing the Docker image
       - setup_remote_docker

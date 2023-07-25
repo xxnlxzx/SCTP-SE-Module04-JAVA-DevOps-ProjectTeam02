@@ -7,7 +7,7 @@ orbs:
 executors:
   docker-executor:
     docker:
-      - image: circleci/openjdk:17.0.1
+      - image: circleci/openjdk:17*
 
 jobs:
   ci:

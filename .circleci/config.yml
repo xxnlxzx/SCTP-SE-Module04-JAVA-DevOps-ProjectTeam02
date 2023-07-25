@@ -38,6 +38,9 @@ jobs:
 
       # Run Snyk security scan
       - run:
+          name: Install Snyk
+          command: npm install -g snyk  # Install snyk globally
+      - run:
           name: Snyk Security Scan
           command: snyk test
 

@@ -1,96 +1,92 @@
-version: 2.1
 orbs:
   docker: circleci/docker@2.2.0
   maven: circleci/maven@1.4.1
   snyk: snyk/snyk@1.4.0
-  heroku: circleci/heroku@2.0.0
-jobs:
-  build_and_test:
-    docker:
-      - image: cimg/openjdk:17.0.7
-    steps:
-      - checkout
-      - run: mvn clean package
-      - run: |
-          echo “Running tests...”
-          mvn test
   
-  #Job to perform Snyk scan
-  snyk_scan:
+executors:
+  docker-executor:
     docker:
-      - image: cimg/openjdk:17-jdk-alpine
-    environment:
-      IMAGE_NAME: xxnlxzx/module04-project:latest
+      - image: circleci/openjdk:17-jdk-alpine
+
+jobs:
+  ci:
+    executor: docker-executor
     steps:
       - checkout
-      - run: mvn clean package
-      - setup_remote_docker
-      - docker/check
-      - run: docker build -t $IMAGE_NAME .
-      - snyk/scan:
-          docker-image-name: $IMAGE_NAME
-  # Job to build the Docker image and push to DockerHub
-  docker_build_and_push:
-    # executor: docker/docker
-    docker:
-      - image: cimg/openjdk:17.0.7
-    steps:
-      - checkout
-      - run: mvn clean package
-      - setup_remote_docker
+
+      # Restore dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "pom.xml" }}
+
+      # Install dependencies
       - run:
-          name: Build and Push Docker Image
-          command: |
-            docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
-            docker build -t ${DOCKER_LOGIN}/module04-project:${CIRCLE_SHA1} .
-            docker push ${DOCKER_LOGIN}/module04-project:${CIRCLE_SHA1}
-  # Deploy to Heroku
-  deploy_to_heroku:
-    executor: docker/docker
+          name: Install Dependencies
+          command: mvn dependency:go-offline
+
+      # Save dependencies for future runs
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "pom.xml" }}
+
+      # Run Maven tests
+      - run:
+          name: Run Maven Test
+          command: mvn test
+
+      # Run Snyk security scan
+      - run:
+          name: Snyk Security Scan
+          command: snyk test
+
+  cd:
+    executor: docker-executor
     steps:
       - checkout
+
+      # Install Docker for building and pushing the Docker image
       - setup_remote_docker
-      - heroku/install
+
+      # Build the Docker image with semantic control tags
       - run:
-          name: Heroku Container Push
+          name: Build Docker Image
           command: |
-            heroku container:login
-            heroku container:push web -a module04-project
-            heroku container:release web -a module04-project
+            docker build -t module04-project:${CIRCLE_SHA1} -t module04-project:latest .
+
+      # Push the Docker image to a container registry (e.g., Docker Hub)
+      - run:
+          name: Push Docker Image
+          command: |
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            docker push module04-project:${CIRCLE_SHA1}
+            docker push module04-project:latest
+
+  test_functionality_1:
+    executor: docker-executor
+    steps:
+      - checkout
+      # Add steps for testing functionality 1
+
+  test_functionality_2:
+    executor: docker-executor
+    steps:
+      - checkout
+      # Add steps for testing functionality 2
+
+  test_functionality_3:
+    executor: docker-executor
+    steps:
+      - checkout
+      # Add steps for testing functionality 3
+
 workflows:
-  version: 2
-  ci_flow:
+  ci_cd:
     jobs:
-      - build_and_test:
-          filters:
-            branches:
-              only: develop
-      - snyk_scan:
+      - ci
+      - cd:
           requires:
-            - build_and_test
+            - ci
           filters:
             branches:
-              only: develop
-  cicd_flow:
-    jobs:
-      - build_and_test:
-          filters:
-            branches:
-              only: release/MYRELEASE
-      # - snyk_scan:
-      #     filters:
-      #       branches:
-      #         only: release
-      - docker_build_and_push:
-          requires:
-            - build_and_test
-            # - snyk_scan
-          filters:
-            branches:
-              only: release/MYRELEASE
-      - deploy_to_heroku:
-          requires:
-            - docker_build_and_push
-          filters:
-            branches:
-              only: main
+              only: release

@@ -33,17 +33,17 @@ jobs:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}
 
-      # # Build the JAR file
-      # - run:
-      #     name: Build JAR
-      #     command: mvn package -DskipTests=true
-      #     working_directory: /path/to/your/project
+      # Build the JAR file
+      - run:
+          name: Build JAR
+          command: mvn package -DskipTests=true
+          working_directory: C:\Users\Aanlo\Documents\Module04-IntroToDevOps\SCTP-SE-Module04-JAVA-DevOps-ProjectTeam02\target\ProjectHarbourBooking-0.0.1-SNAPSHOT.jar
 
-      # # Persist the JAR file in the workspace
-      # - persist_to_workspace:
-      #     root: /path/to/your/project/target
-      #     paths:
-      #       - ProjectHarbourBooking-0.0.1-SNAPSHOT.jar
+      # Persist the JAR file in the workspace
+      - persist_to_workspace:
+          root: C:\Users\Aanlo\Documents\Module04-IntroToDevOps\SCTP-SE-Module04-JAVA-DevOps-ProjectTeam02\target\
+          paths:
+            - ProjectHarbourBooking-0.0.1-SNAPSHOT.jar
 
       # Run Maven tests
       - run:
@@ -68,9 +68,9 @@ jobs:
     steps:
       - checkout
 
-      # # Restore persisted JAR file from the workspace
-      # - attach_workspace:
-      #     at: /path/to/your/project/target
+      # Restore persisted JAR file from the workspace
+      - attach_workspace:
+          at: C:\Users\Aanlo\Documents\Module04-IntroToDevOps\SCTP-SE-Module04-JAVA-DevOps-ProjectTeam02\target\ProjectHarbourBooking-0.0.1-SNAPSHOT.jar
 
       # Install Docker for building and pushing the Docker image
       - setup_remote_docker

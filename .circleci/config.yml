@@ -53,15 +53,15 @@ jobs:
       - run:
           name: Build Docker Image
           command: |
-            docker build -t module04-project:${CIRCLE_SHA1} -t module04-project:latest .
+            docker build -t module04-project02:${CIRCLE_SHA1} -t module04-project02:latest .
 
       # Push the Docker image to a container registry (e.g., Docker Hub)
       - run:
           name: Push Docker Image
           command: |
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-            docker push module04-project:${CIRCLE_SHA1}
-            docker push module04-project:latest
+            docker push module04-project02:${CIRCLE_SHA1}
+            docker push module04-project02:latest
 
   test_functionality_1:
     executor: docker-executor

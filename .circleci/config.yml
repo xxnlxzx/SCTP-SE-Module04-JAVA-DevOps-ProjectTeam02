@@ -44,21 +44,21 @@ jobs:
           name: Run Maven Test
           command: mvn test
 
-      # 6. Build and Push the Docker image
-      - run:
-          name: Build and Push Docker Image
-          command: |
-            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_LOGIN" --password-stdin
-            docker build -t $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1 .
-            docker push $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1
-
       # 7. Install Snyk CLI and test Docker image
       - run:
-          name: Snyk Test Docker Image
-          command: |
-            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_LOGIN" --password-stdin
-            docker pull $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1
-            snyk test --docker $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1 --severity-threshold=low
+          snyk_scan:
+            docker:
+            - image: cimg/openjdk:17.0.7
+            environment:
+              IMAGE_NAME: xxnlxzx/SCTP-SE-Module04-JAVA-DevOps-ProjectTeam02
+                steps:
+                - checkout
+                - run: mvn clean package
+                - setup_remote_docker
+                - docker/check
+                - run: docker build -t $IMAGE_NAME .
+                - snyk/scan: 
+                  docker-image-name: $IMAGE_NAME
 
   cicd_flow:
     executor: docker-executor

@@ -33,23 +33,16 @@ jobs:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}
 
-      # # Build the JAR file
-      # - run:
-      #     name: Build JAR
-      #     command: mvn package -DskipTests=true
-      #     working_directory: C:\Users\Aanlo\Documents\Module04-IntroToDevOps\SCTP-SE-Module04-JAVA-DevOps-ProjectTeam02\target\ProjectHarbourBooking-0.0.1-SNAPSHOT.jar
-
-      # # Persist the JAR file in the workspace
-      # - persist_to_workspace:
-      #     root: C:\Users\Aanlo\Documents\Module04-IntroToDevOps\SCTP-SE-Module04-JAVA-DevOps-ProjectTeam02\target\
-      #     paths:
-      #       - ProjectHarbourBooking-0.0.1-SNAPSHOT.jar
+      # Build the JAR file
+      - run:
+          name: Build JAR
+          command: mvn package -DskipTests=true
+          working_directory: /home/circleci/project  # Adjust this path based on your project structure
 
       # Run Maven tests
-      - run: Run Maven Test
-      - run: |
-          echo "Running Test..."
-          mvn test
+      - run:
+          name: Run Maven Test
+          command: mvn test
 
       # Install Docker for building and pushing the Docker image
       - setup_remote_docker
@@ -68,47 +61,40 @@ jobs:
             docker push module04-project02:${CIRCLE_SHA1}
             docker push module04-project02:latest
 
-        test_functionality_1:
-          executor: docker-executor
-          steps:
-            - checkout
-            # Add steps for testing functionality 1
+      # Run Spring Boot tests for functionality 1
+      - run:
+          name: Test Functionality 1
+          command: |
+            # Add your command to run tests for functionality 1
+            # For example, if you are using Maven:
+            mvn test -Dtest=Functionality1Test
 
-        test_functionality_2:
-          executor: docker-executor
-          steps:
-            - checkout
-            # Add steps for testing functionality 2
+      # Run Spring Boot tests for functionality 2
+      - run:
+          name: Test Functionality 2
+          command: |
+            # Add your command to run tests for functionality 2
+            # For example, if you are using Maven:
+            mvn test -Dtest=Functionality2Test
 
-        test_functionality_3:
-          executor: docker-executor
-          steps:
-            - checkout
-            # Add steps for testing functionality 3
-            
-      # # Authenticate with Snyk
-      # - run:
-      #     name: Authenticate with Snyk
-      #     command: echo "$SNYK_TOKEN" | npx snyk auth
-      
-      # Run Snyk security scan
-      # - run:
-      #     name: Install Snyk
-      #     command: npm install -g snyk --prefix=/home/circleci/.npm-global  # Install snyk globally
-      # - run:
-      #     name: Snyk Security Scan
-      #     command: npx snyk test
+      # Run Spring Boot tests for functionality 3
+      - run:
+          name: Test Functionality 3
+          command: |
+            # Add your command to run tests for functionality 3
+            # For example, if you are using Maven:
+            mvn test -Dtest=Functionality3Test
 
   cicd_flow:
     executor: docker-executor
     steps:
       - checkout
 
-      # # Restore persisted JAR file from the workspace
-      # - attach_workspace:
-      #     at: C:\Users\Aanlo\Documents\Module04-IntroToDevOps\SCTP-SE-Module04-JAVA-DevOps-ProjectTeam02\target\ProjectHarbourBooking-0.0.1-SNAPSHOT.jar
+      # Attach the persisted JAR file from the workspace
+      - attach_workspace:
+          at: /home/circleci/project/target  # Adjust this path based on your project structure
 
-
+      # Your other steps for CI/CD flow, e.g., deploying to production, etc.
 
 workflows:
   version: 2

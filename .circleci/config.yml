@@ -15,9 +15,19 @@ jobs:
   ci_flow:
     executor: docker-executor
     steps:
+      # 1. Spin up environment
       - checkout
 
-      # Restore and cache Maven dependencies
+      # 2. Spin up container environment
+      - setup_remote_docker
+
+      # 3. Preparing environment variables (if needed)
+
+      # 4. Checkout code
+      - attach_workspace:
+          at: /home/circleci/project/target  # Adjust this path based on your project structure
+
+      # 5. Restore and cache Maven dependencies
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "pom.xml" }}-{{ checksum "pom.xml" }}
@@ -29,21 +39,32 @@ jobs:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}-{{ checksum "pom.xml" }}
 
-      # Build the JAR file
+      # 6. Run Maven tests
+      - run:
+          name: Run Maven Test
+          command: mvn test
+
+      # 7. Snyk test (assuming you have configured snyk properly)
+      - run:
+          name: Run Snyk Test
+          command: snyk test
+
+  cicd_flow:
+    executor: docker-executor
+    steps:
+      # 1. Spin up environment
+      - checkout
+
+      # 2. Build JAR
       - run:
           name: Build JAR
           command: mvn package -DskipTests=true
           working_directory: /home/circleci/project  # Path to project
 
-      # Run Maven tests
-      - run:
-          name: Run Maven Test
-          command: mvn test
-
-      # Install Docker for building and pushing the Docker image
+      # 3. Setup a remote Docker engine (optional, depending on your setup)
       - setup_remote_docker
 
-      # Build and Push the Docker image to a container registry (e.g., Docker Hub)
+      # 4. Build and Push Docker image
       - run:
           name: Build and Push Docker Image
           command: |
@@ -51,28 +72,17 @@ jobs:
             docker build -t $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1 .
             docker push $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1
 
-      # Run the Docker container
+      # 5. Run Docker container (optional, you can skip this if not needed)
       - run:
           name: Run Docker Container
           command: |
             docker run -d -p 8000:8080 $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1
 
-      # Run Spring Boot tests for functionality 1, 2, and 3
+      # 6. Deploy and run the application on Heroku (adjust this step according to your deployment process)
       - run:
-          name: Test Functionality Tests
+          name: Deploy to Heroku
           command: |
-            mvn test -Dgroups="functionality1,functionality2,functionality3"
-
-  cicd_flow:
-    executor: docker-executor
-    steps:
-      - checkout
-
-      # Attach the persisted JAR file from the workspace
-      - attach_workspace:
-          at: /home/circleci/project/target  # Adjust this path based on your project structure
-
-      # Your other steps for CI/CD flow, e.g., deploying to production, etc.
+            # Add your deployment steps for Heroku here
 
 workflows:
   version: 2

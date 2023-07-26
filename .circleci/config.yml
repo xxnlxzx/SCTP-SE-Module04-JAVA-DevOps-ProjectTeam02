@@ -17,21 +17,17 @@ jobs:
     steps:
       - checkout
 
-      # Restore dependencies
+      # Restore and cache Maven dependencies
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "pom.xml" }}
-
-      # Install dependencies
+            - v1-dependencies-{{ checksum "pom.xml" }}-{{ checksum "pom.xml" }}
       - run:
           name: Install Dependencies
           command: mvn dependency:go-offline
-
-      # Save dependencies for future runs
       - save_cache:
           paths:
             - ~/.m2
-          key: v1-dependencies-{{ checksum "pom.xml" }}
+          key: v1-dependencies-{{ checksum "pom.xml" }}-{{ checksum "pom.xml" }}
 
       # Build the JAR file
       - run:
@@ -55,30 +51,11 @@ jobs:
             docker build -t $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1 .
             docker push $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1
 
-
-      # Run Spring Boot tests for functionality 1
+      # Run Spring Boot tests for functionality 1, 2, and 3
       - run:
-          name: Test Functionality 1
+          name: Test Functionality Tests
           command: |
-            # Add your command to run tests for functionality 1
-            # For example, if you are using Maven:
-            mvn test -Dtest=Functionality1Test
-
-      # Run Spring Boot tests for functionality 2
-      - run:
-          name: Test Functionality 2
-          command: |
-            # Add your command to run tests for functionality 2
-            # For example, if you are using Maven:
-            mvn test -Dtest=Functionality2Test
-
-      # Run Spring Boot tests for functionality 3
-      - run:
-          name: Test Functionality 3
-          command: |
-            # Add your command to run tests for functionality 3
-            # For example, if you are using Maven:
-            mvn test -Dtest=Functionality3Test
+            mvn test -Dgroups="functionality1,functionality2,functionality3"
 
   cicd_flow:
     executor: docker-executor

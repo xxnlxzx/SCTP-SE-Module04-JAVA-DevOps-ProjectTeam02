@@ -57,7 +57,7 @@ jobs:
       - run:
           name: Push Docker Image
           command: |
-            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
             docker push module04-project02:${CIRCLE_SHA1}
             docker push module04-project02:latest
 

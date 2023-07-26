@@ -46,10 +46,46 @@ jobs:
       #       - ProjectHarbourBooking-0.0.1-SNAPSHOT.jar
 
       # Run Maven tests
-      - run:
-          name: Run Maven Test
-          command: mvn test
+      - run: Run Maven Test
+      - run: |
+          echo "Running Test..."
+          mvn test
 
+      # Install Docker for building and pushing the Docker image
+      - setup_remote_docker
+
+      # Build the Docker image with semantic control tags
+      - run:
+          name: Build Docker Image
+          command: |
+            docker build -t module04-project02:${CIRCLE_SHA1} -t module04-project02:latest .
+
+      # Push the Docker image to a container registry (e.g., Docker Hub)
+      - run:
+          name: Push Docker Image
+          command: |
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            docker push module04-project02:${CIRCLE_SHA1}
+            docker push module04-project02:latest
+
+        test_functionality_1:
+          executor: docker-executor
+          steps:
+            - checkout
+            # Add steps for testing functionality 1
+
+        test_functionality_2:
+          executor: docker-executor
+          steps:
+            - checkout
+            # Add steps for testing functionality 2
+
+        test_functionality_3:
+          executor: docker-executor
+          steps:
+            - checkout
+            # Add steps for testing functionality 3
+            
       # # Authenticate with Snyk
       # - run:
       #     name: Authenticate with Snyk
@@ -72,40 +108,7 @@ jobs:
       # - attach_workspace:
       #     at: C:\Users\Aanlo\Documents\Module04-IntroToDevOps\SCTP-SE-Module04-JAVA-DevOps-ProjectTeam02\target\ProjectHarbourBooking-0.0.1-SNAPSHOT.jar
 
-      # Install Docker for building and pushing the Docker image
-      - setup_remote_docker
 
-      # Build the Docker image with semantic control tags
-      - run:
-          name: Build Docker Image
-          command: |
-            docker build -t module04-project02:${CIRCLE_SHA1} -t module04-project02:latest .
-
-      # Push the Docker image to a container registry (e.g., Docker Hub)
-      - run:
-          name: Push Docker Image
-          command: |
-            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-            docker push module04-project02:${CIRCLE_SHA1}
-            docker push module04-project02:latest
-
-  test_functionality_1:
-    executor: docker-executor
-    steps:
-      - checkout
-      # Add steps for testing functionality 1
-
-  test_functionality_2:
-    executor: docker-executor
-    steps:
-      - checkout
-      # Add steps for testing functionality 2
-
-  test_functionality_3:
-    executor: docker-executor
-    steps:
-      - checkout
-      # Add steps for testing functionality 3
 
 workflows:
   version: 2

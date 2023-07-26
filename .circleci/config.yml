@@ -12,7 +12,7 @@ executors:
           NODE_VERSION: "14"  # Specify the Node.js version you want
 
 jobs:
-  ci:
+  ci_flow:
     executor: docker-executor
     steps:
       - checkout
@@ -63,7 +63,7 @@ jobs:
       #     name: Snyk Security Scan
       #     command: npx snyk test
 
-  cd:
+  cicd_flow:
     executor: docker-executor
     steps:
       - checkout
@@ -109,12 +109,12 @@ jobs:
 
 workflows:
   version: 2
-  ci_cd:
+  cicd_flow:
     jobs:
-      - ci
-      - cd:
+      - ci_flow
+      - cicd_flow:
           requires:
-            - ci
+            - ci_flow
           filters:
             branches:
               only: release

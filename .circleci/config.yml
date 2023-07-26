@@ -51,6 +51,12 @@ jobs:
             docker build -t $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1 .
             docker push $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1
 
+      # Run the Docker container
+      - run:
+          name: Run Docker Container
+          command: |
+            docker run -d -p 8000:8080 $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1
+
       # Run Spring Boot tests for functionality 1, 2, and 3
       - run:
           name: Test Functionality Tests
@@ -78,4 +84,4 @@ workflows:
             - ci_flow
           filters:
             branches:
-              only: release
+              only: develop

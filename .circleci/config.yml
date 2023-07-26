@@ -48,7 +48,6 @@ jobs:
       # 7. Install Snyk CLI and test Docker image
       - run: npm install -g snyk
       - run: mvn clean package
-      - setup_remote_docker
       - docker/check
       - run: docker build -t $IMAGE_NAME .
       - run: snyk test --docker $IMAGE_NAME --severity-threshold=low

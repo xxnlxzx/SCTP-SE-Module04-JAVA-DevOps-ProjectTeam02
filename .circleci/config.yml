@@ -9,7 +9,7 @@ executors:
     docker:
       - image: cimg/openjdk:17.0.7
         environment:
-          NODE_VERSION: "14"  # Specify the Node.js version you want
+          NODE_VERSION: "14"  # Specify the Node.js version
 
 jobs:
   ci_flow:
@@ -37,7 +37,7 @@ jobs:
       - run:
           name: Build JAR
           command: mvn package -DskipTests=true
-          working_directory: /home/circleci/project  # Adjust this path based on your project structure
+          working_directory: /home/circleci/project  # Path to project
 
       # Run Maven tests
       - run:
@@ -46,12 +46,6 @@ jobs:
 
       # Install Docker for building and pushing the Docker image
       - setup_remote_docker
-
-      # # Build the Docker image with semantic control tags
-      # - run:
-      #     name: Build Docker Image
-      #     command: |
-      #       docker build -t module04-project02:${CIRCLE_SHA1} -t module04-project02:latest .
 
       # Build and Push the Docker image to a container registry (e.g., Docker Hub)
       - run:

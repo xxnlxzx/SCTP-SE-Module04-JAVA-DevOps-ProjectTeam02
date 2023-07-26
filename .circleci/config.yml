@@ -47,19 +47,19 @@ jobs:
       # Install Docker for building and pushing the Docker image
       - setup_remote_docker
 
-      # Build the Docker image with semantic control tags
-      - run:
-          name: Build Docker Image
-          command: |
-            docker build -t module04-project02:${CIRCLE_SHA1} -t module04-project02:latest .
+      # # Build the Docker image with semantic control tags
+      # - run:
+      #     name: Build Docker Image
+      #     command: |
+      #       docker build -t module04-project02:${CIRCLE_SHA1} -t module04-project02:latest .
 
-      # Push the Docker image to a container registry (e.g., Docker Hub)
+      # Build and Push the Docker image to a container registry (e.g., Docker Hub)
       - run:
-          name: Push Docker Image
+          name: Build and Push Docker Image
           command: |
-            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+            echo docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
+            docker build -t module04-project02:${CIRCLE_SHA1} .
             docker push module04-project02:${CIRCLE_SHA1}
-            docker push module04-project02:latest
 
       # Run Spring Boot tests for functionality 1
       - run:

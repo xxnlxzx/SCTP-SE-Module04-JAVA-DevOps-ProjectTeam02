@@ -50,6 +50,8 @@ jobs:
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_LOGIN" --password-stdin
             docker build -t $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1 .
             docker push $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1
+            docker tag $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1 localhost/module04-project02:$CIRCLE_SHA1
+            docker push localhost/module04-project02:$CIRCLE_SHA1
 
       # Run the Docker container
       - run:

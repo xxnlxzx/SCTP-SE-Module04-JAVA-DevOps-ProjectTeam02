@@ -10,7 +10,7 @@ executors:
       - image: cimg/openjdk:17.0.7
         environment:
           NODE_VERSION: "14"  # Specify the Node.js version
-      - image: cimg/node:14.x  # Add Node.js 14.x image
+      - image: cimg/node:14.18  # Add Node.js 14.x image
 
 jobs:
   ci_flow:

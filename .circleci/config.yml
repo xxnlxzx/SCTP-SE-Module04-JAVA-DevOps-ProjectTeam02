@@ -10,6 +10,7 @@ executors:
       - image: cimg/openjdk:17.0.7
         environment:
           NODE_VERSION: "14"  # Specify the Node.js version
+      - image: cimg/node:lts   # Add Node.js image
 
 jobs:
   ci_flow:
@@ -45,9 +46,9 @@ jobs:
           command: mvn test
 
       # 7. Install Snyk CLI and test Docker image
-      - checkout
       - run: npm install -g snyk
       - run: mvn clean package
+      - setup_remote_docker
       - docker/check
       - run: docker build -t $IMAGE_NAME .
       - run: snyk test --docker $IMAGE_NAME --severity-threshold=low

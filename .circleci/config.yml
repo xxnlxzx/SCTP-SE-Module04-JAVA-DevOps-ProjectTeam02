@@ -58,8 +58,8 @@ jobs:
           name: Build and Push Docker Image
           command: |
             echo docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
-            docker build -t module04-project02:${CIRCLE_SHA1} .
-            docker push module04-project02:${CIRCLE_SHA1}
+            docker build -t ${DOCKER_LOGIN}/module04-project02:${CIRCLE_SHA1} .
+            docker push ${DOCKER_LOGIN}/module04-project02:${CIRCLE_SHA1}
 
       # Run Spring Boot tests for functionality 1
       - run:

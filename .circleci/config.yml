@@ -44,14 +44,21 @@ jobs:
           name: Run Maven Test
           command: mvn test
 
-      # 7. Install Snyk CLI
-      - snyk/scan:
-          docker-image-name: $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1
-
-      # 8. Run Snyk Test (assuming you have configured snyk properly)
+      # 6. Build and Push the Docker image
       - run:
-          name: Run Snyk Test
-          command: snyk test
+          name: Build and Push Docker Image
+          command: |
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_LOGIN" --password-stdin
+            docker build -t $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1 .
+            docker push $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1
+
+      # 7. Install Snyk CLI and test Docker image
+      - run:
+          name: Snyk Test Docker Image
+          command: |
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_LOGIN" --password-stdin
+            docker pull $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1
+            snyk test --docker $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1 --severity-threshold=low
 
   cicd_flow:
     executor: docker-executor

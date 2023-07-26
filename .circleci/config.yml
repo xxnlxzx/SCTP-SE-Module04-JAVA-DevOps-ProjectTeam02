@@ -45,20 +45,19 @@ jobs:
           command: mvn test
 
       # 7. Install Snyk CLI and test Docker image
-      - run:
-          snyk_scan:
-            docker:
+      - snyk_scan:
+          docker:
             - image: cimg/openjdk:17.0.7
-            environment:
-              IMAGE_NAME: xxnlxzx/SCTP-SE-Module04-JAVA-DevOps-ProjectTeam02
-                steps:
-                - checkout
-                - run: mvn clean package
-                - setup_remote_docker
-                - docker/check
-                - run: docker build -t $IMAGE_NAME .
-                - snyk/scan: 
-                  docker-image-name: $IMAGE_NAME
+          environment:
+            IMAGE_NAME: xxnlxzx/SCTP-SE-Module04-JAVA-DevOps-ProjectTeam02
+          steps:
+            - checkout
+            - run: mvn clean package
+            - setup_remote_docker
+            - docker/check
+            - run: docker build -t $IMAGE_NAME .
+            - snyk/scan:
+                docker-image-name: $IMAGE_NAME
 
   cicd_flow:
     executor: docker-executor

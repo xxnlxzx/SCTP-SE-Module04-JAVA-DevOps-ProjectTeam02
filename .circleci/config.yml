@@ -45,7 +45,7 @@ jobs:
           command: mvn test
 
       # 7. Install Snyk CLI and test Docker image
-          name: snyk_scan:
+      - snyk_scan:
           docker:
             - image: cimg/openjdk:17.0.7
           environment:

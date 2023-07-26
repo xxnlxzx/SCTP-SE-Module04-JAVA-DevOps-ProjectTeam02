@@ -47,7 +47,7 @@ jobs:
       # 7. Install Snyk CLI
       - run:
           name: Install Snyk CLI
-          command: npm install -g snyk
+          command: npx install -g snyk
 
       # Snyk test (assuming you have configured snyk properly)
       - run:

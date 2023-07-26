@@ -84,4 +84,4 @@ workflows:
             - ci_flow
           filters:
             branches:
-              only: develop
+              only: release

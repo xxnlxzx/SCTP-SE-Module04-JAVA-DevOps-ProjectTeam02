@@ -2,7 +2,7 @@ version: 2.1
 orbs:
   docker: circleci/docker@2.2.0
   maven: circleci/maven@1.4.1
-  snyk: snyk/snyk@1.4.0
+  snyk: snyk/snyk@1.7.0
 
 executors:
   docker-executor:
@@ -45,9 +45,19 @@ jobs:
           command: mvn test
 
       # 7. Install Snyk CLI
-      - run:
-          name: Install Snyk CLI
-          command: npx install -g snyk
+    snyk_scan:
+      docker:
+        - image: cimg/openjdk:17.0.7
+      environment:
+        IMAGE_NAME: $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1
+      steps:
+        - checkout
+        - run: mvn clean package
+        - setup_remote_docker
+        - docker/check
+        - run: docker build -t $IMAGE_NAME .
+        - snyk/scan: 
+            docker-image-name: $IMAGE_NAME
 
       # Snyk test (assuming you have configured snyk properly)
       - run:
@@ -76,8 +86,6 @@ jobs:
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_LOGIN" --password-stdin
             docker build -t $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1 .
             docker push $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1
-            docker tag $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1 localhost/module04-project02:$CIRCLE_SHA1
-            docker push localhost/module04-project02:$CIRCLE_SHA1
 
       # 5. Run Docker container (optional, you can skip this if not needed)
       - run:

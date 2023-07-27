@@ -59,8 +59,6 @@ deploy_to_heroku:
     - run:
         name: Login to Heroku Container Registry
         command: heroku container:login
-          environment:
-            HEROKU_API_KEY: $HEROKU_API_KEY
     - run:
         name: Heroku Container Push
         command: |

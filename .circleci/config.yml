@@ -1,9 +1,8 @@
 version: 2.1
 orbs:
   docker: circleci/docker@2.2.0
-  maven: circleci/maven@1.4.1
   snyk: snyk/snyk@1.7.0
-
+  # heroku: circleci/heroku@2.0.0
 jobs:
   build_and_test:
     docker:
@@ -11,53 +10,84 @@ jobs:
     steps:
       - checkout
       - run: mvn clean package
-      - run:
-          name: Running tests...
-          command: mvn test
-
-  cicd_flow:
-    executor: docker-executor
+      - run: |
+          echo “Running tests...”
+          mvn test
+  
+  #Job to perform Snyk scan
+  snyk_scan:
+    docker:
+      - image: cimg/openjdk:17.0.7
+    environment:
+      IMAGE_NAME: xxnlxzx/SCTP-SE-Module04-JAVA-DevOps-ProjectTeam02
     steps:
-      # 1. Spin up environment
       - checkout
-
-      # 2. Build JAR
-      - run:
-          name: Build JAR
-          command: mvn package -DskipTests=true
-          working_directory: /home/circleci/project  # Path to project
-
-      # 3. Setup a remote Docker engine (optional, depending on your setup)
+      - run: mvn clean package
       - setup_remote_docker
-
-      # 4. Build and Push Docker image
+      - docker/check
+      - run: docker build -t $IMAGE_NAME .
+      - snyk/scan: 
+          docker-image-name: $IMAGE_NAME
+  
+  # Job to build the Docker iamge and push to DockerHub
+  docker_build_and_push:
+    # executor: docker/docker
+    docker:
+      - image: cimg/openjdk:17.0.7
+    steps:
+      - checkout
+      - run: mvn clean package
+      - setup_remote_docker
       - run:
           name: Build and Push Docker Image
           command: |
-            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_LOGIN" --password-stdin
-            docker build -t $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1 .
-            docker push $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1
+            docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
+            docker build -t ${DOCKER_LOGIN}/module04-project02:${CIRCLE_SHA1} .
+            docker push ${DOCKER_LOGIN}/module04-project02:${CIRCLE_SHA1}
+            
 
-      # 5. Run Docker container (optional, you can skip this if not needed)
-      - run:
-          name: Run Docker Container
-          command: |
-            docker run -d -p 8000:8080 $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1
-
-      # 6. Deploy and run the application on Heroku (adjust this step according to your deployment process)
-      - run:
-          name: Deploy to Heroku
-          command: |
-            # Add your deployment steps for Heroku here
+  # # Deploy to Heroku
+  # deploy_to_heroku:
+  #   #executor: docker/docker
+  #   docker:
+  #     - image: cimg/openjdk:17.0.7
+  #   steps:
+  #     - checkout
+  #     - run: mvn clean package
+  #     - setup_remote_docker
+  #     - heroku/install
+  #     - run:
+  #         name: Heroku Container Push
+  #         command: |
+  #           heroku container:login
+  #           heroku container:push web -a harbour-booking-api
+  #           heroku container:release web -a harbour-booking-api
 
 workflows:
-  version: 2
-  cicd_flow:
+  ci_flow:
     jobs:
-      - build_and_test
-      - cicd_flow:
+      - build_and_test:
+          filters:
+            branches:
+              only: develop
+      - snyk_scan:
           requires:
             - build_and_test
           filters:
             branches:
               only: develop
+
+  cicd_flow:
+    jobs:
+      - docker_build_and_push:
+          filters:
+            branches:
+              only: main
+      - deploy_to_heroku:
+          requires:
+            - docker_build_and_push
+          filters:
+            branches:
+              only: main
+
+         

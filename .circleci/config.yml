@@ -80,17 +80,15 @@ workflows:
             branches:
               only: develop
 
-cicd_flow:
+  cicd_flow:
     jobs:
       - docker_build_and_push:
           filters:
             branches:
-              only: main
+              only: release
       - deploy_to_heroku:
           requires:
             - docker_build_and_push
           filters:
             branches:
-              only: main
-
-    continue_on_fail: true
+              only: release

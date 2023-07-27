@@ -11,7 +11,7 @@ jobs:
       - checkout
       - run: mvn clean package
       - run: |
-          echo “Running tests...”
+          echo "Running tests..."
           mvn test
   
   #Job to perform Snyk scan
@@ -60,8 +60,8 @@ jobs:
           name: Heroku Container Push
           command: |
             heroku container:login
-            heroku container:push web -a harbour-booking-api
-            heroku container:release web -a harbour-booking-api
+            heroku container:push web -a module04-project02
+            heroku container:release web -a module04-project02
   #
 
 workflows:
@@ -84,9 +84,9 @@ workflows:
           filters:
             branches:
               only: main
-      # - deploy_to_heroku:
+      - deploy_to_heroku:
           requires:
             - docker_build_and_push
           filters:
-      #       branches:
-      #         only: main
+            branches:
+              only: main

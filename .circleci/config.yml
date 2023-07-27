@@ -47,21 +47,21 @@ jobs:
             
 
   # Deploy to Heroku
-  # deploy_to_heroku:
-  #   #executor: docker/docker
-  #   docker:
-  #     - image: cimg/openjdk:17.0.7
-  #   steps:
-  #     - checkout
-  #     - run: mvn clean package
-  #     - setup_remote_docker
-  #     - heroku/install
-  #     - run:
-  #         name: Heroku Container Push
-  #         command: |
-  #           heroku container:login
-  #           heroku container:push web -a harbour-booking-api
-  #           heroku container:release web -a harbour-booking-api
+  deploy_to_heroku:
+    #executor: docker/docker
+    docker:
+      - image: cimg/openjdk:17.0.7
+    steps:
+      - checkout
+      - run: mvn clean package
+      - setup_remote_docker
+      - heroku/install
+      - run:
+          name: Heroku Container Push
+          command: |
+            heroku container:login
+            heroku container:push web -a module04-project02
+            heroku container:release web -a module04-project02
   #
 
 workflows:
@@ -78,15 +78,15 @@ workflows:
             branches:
               only: develop
 
-  # cicd_flow:
-  #   jobs:
-  #     - docker_build_and_push:
-  #         filters:
-  #           branches:
-  #             only: main
-      # # - deploy_to_heroku:
-      #     requires:
-      #       - docker_build_and_push
-      #     filters:
-      #       branches:
-      #         only: main
+  cicd_flow:
+    jobs:
+      - docker_build_and_push:
+          filters:
+            branches:
+              only: main
+      # - deploy_to_heroku:
+          requires:
+            - docker_build_and_push
+          filters:
+            branches:
+              only: main

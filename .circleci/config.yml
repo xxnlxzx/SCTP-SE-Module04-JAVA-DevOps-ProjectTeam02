@@ -4,16 +4,21 @@ orbs:
   maven: circleci/maven@1.4.1
   snyk: snyk/snyk@1.7.0
 
-executors:
-  docker-executor:
+jobs:
+  build_and_test:
     docker:
       - image: cimg/openjdk:17.0.7
         environment:
           NODE_VERSION: "14"  # Specify the Node.js version
       - image: cimg/node:14.18  # Add Node.js 14.x image
 
-jobs:
-  ci_flow:
+    steps:
+      - checkout
+      - run: mvn clean package
+      - run: |
+          echo “Running tests...”
+          mvn test
+
     executor: docker-executor
     steps:
       # 1. Spin up environment
@@ -40,12 +45,7 @@ jobs:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}-{{ checksum "pom.xml" }}
 
-      # 6. Run Maven tests
-      - run:
-          name: Run Maven Test
-          command: mvn test
-
-      # 7. Install Snyk CLI and test Docker image
+      # 6. Install Snyk CLI and test Docker image
       - run: npm install -g snyk
       - run: mvn clean package
       - docker/check

@@ -93,4 +93,4 @@ cicd_flow:
             branches:
               only: main
 
-      continue_on_fail: true
+    continue_on_fail: true

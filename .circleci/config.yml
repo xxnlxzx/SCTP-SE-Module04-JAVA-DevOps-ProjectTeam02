@@ -1,87 +1,96 @@
 version: 2.1
 orbs:
   docker: circleci/docker@2.2.0
-  maven: circleci/maven@1.4.1
-  snyk: snyk/snyk@1.4.0
-
-executors:
-  docker-executor:
-    docker:
-      - image: cimg/openjdk:17.0.7
-        environment:
-          NODE_VERSION: "14"  # Specify the Node.js version
+  snyk: snyk/snyk@1.7.0
+  heroku: circleci/heroku@2.0.0
 
 jobs:
-  ci_flow:
-    executor: docker-executor
+  # Job to Build and Test
+  build_and_test:
+    docker:
+      - image: cimg/openjdk:17.0.7
     steps:
       - checkout
+      - run: mvn clean package
+      - run: |
+          echo "Running tests..."
+          mvn test
 
-      # Restore and cache Maven dependencies
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "pom.xml" }}-{{ checksum "pom.xml" }}
-      - run:
-          name: Install Dependencies
-          command: mvn dependency:go-offline
-      - save_cache:
-          paths:
-            - ~/.m2
-          key: v1-dependencies-{{ checksum "pom.xml" }}-{{ checksum "pom.xml" }}
-
-      # Build the JAR file
-      - run:
-          name: Build JAR
-          command: mvn package -DskipTests=true
-          working_directory: /home/circleci/project  # Path to project
-
-      # Run Maven tests
-      - run:
-          name: Run Maven Test
-          command: mvn test
-
-      # Install Docker for building and pushing the Docker image
+  # Job to perform Snyk scan
+  snyk_scan:
+    docker:
+      - image: cimg/openjdk:17.0.7
+    environment:
+      IMAGE_NAME: xxnlxzx/sctp-se-module04-java-devops-projectteam02 # Use lowercase repository name
+    steps:
+      - checkout
+      - run: mvn clean package
       - setup_remote_docker
+      - docker/check
+      - run: docker build -t $IMAGE_NAME .
+      - snyk/scan:
+          docker-image-name: $IMAGE_NAME
 
-      # Build and Push the Docker image to a container registry (e.g., Docker Hub)
+  # Job to build the Docker image and push to DockerHub
+  docker_build_and_push:
+    # executor: docker/docker
+    docker:
+      - image: cimg/openjdk:17.0.7
+    steps:
+      - checkout
+      - run: mvn clean package
+      - setup_remote_docker
       - run:
           name: Build and Push Docker Image
           command: |
-            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_LOGIN" --password-stdin
-            docker build -t $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1 .
-            docker push $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1
+            docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
+            docker build -t ${DOCKER_LOGIN}/module04-project02:${CIRCLE_SHA1} .
+            docker push ${DOCKER_LOGIN}/module04-project02:${CIRCLE_SHA1}
 
-      # Run the Docker container
-      - run:
-          name: Run Docker Container
-          command: |
-            docker run -d -p 8000:8080 $DOCKER_LOGIN/module04-project02:$CIRCLE_SHA1
-
-      # Run Spring Boot tests for functionality 1, 2, and 3
-      - run:
-          name: Test Functionality Tests
-          command: |
-            mvn test -Dgroups="functionality1,functionality2,functionality3"
-
-  cicd_flow:
-    executor: docker-executor
+  # Deploy to Heroku
+  deploy_to_heroku:
+    # executor: docker/docker
+    docker:
+      - image: cimg/openjdk:17.0.7
     steps:
       - checkout
-
-      # Attach the persisted JAR file from the workspace
-      - attach_workspace:
-          at: /home/circleci/project/target  # Adjust this path based on your project structure
-
-      # Your other steps for CI/CD flow, e.g., deploying to production, etc.
+      - run: mvn clean package
+      - setup_remote_docker
+      - heroku/install
+      - run:
+          name: Login to Heroku Container Registry
+          command: heroku container:login
+      - run:
+          name: Heroku Container Push
+          command: |
+            heroku container:push web -a module04-project02
+            heroku container:release web -a module04-project02
 
 workflows:
-  version: 2
-  cicd_flow:
+  ci_flow:
     jobs:
-      - ci_flow
-      - cicd_flow:
-          requires:
-            - ci_flow
+      - build_and_test:
           filters:
             branches:
-              only: release
+              only: develop
+      - snyk_scan:
+          requires:
+            - build_and_test
+          filters:
+            branches:
+              only: develop
+
+cicd_flow:
+    jobs:
+      - docker_build_and_push:
+          filters:
+            branches:
+              only: main
+      - deploy_to_heroku:
+          requires:
+            - docker_build_and_push
+          filters:
+            branches:
+              only: main
+
+    continue_on_fail: true

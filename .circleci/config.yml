@@ -5,7 +5,7 @@ orbs:
   heroku: circleci/heroku@2.0.0
 jobs:
   #Job to Build and Test
-  build_and_test:
+build_and_test:
     docker:
       - image: cimg/openjdk:17.0.7
     steps:
@@ -14,9 +14,9 @@ jobs:
       - run: |
           echo "Running tests..."
           mvn test
-jobs:
+  
   #Job to perform Snyk scan
-  snyk_scan:
+snyk_scan:
     docker:
       - image: cimg/openjdk:17.0.7
     environment:
@@ -30,9 +30,9 @@ jobs:
       - snyk/scan: 
           docker-image-name: $IMAGE_NAME
 
-Jobs:
+  
   #Job to build the Docker image and push to DockerHub
-  docker_build_and_push:
+docker_build_and_push:
     # executor: docker/docker
     docker:
       - image: cimg/openjdk:17.0.7

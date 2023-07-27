@@ -2,8 +2,9 @@ version: 2.1
 orbs:
   docker: circleci/docker@2.2.0
   snyk: snyk/snyk@1.7.0
-  # heroku: circleci/heroku@2.0.0
+  heroku: circleci/heroku@2.0.0
 jobs:
+  #Job to Build and Test
   build_and_test:
     docker:
       - image: cimg/openjdk:17.0.7
@@ -11,9 +12,9 @@ jobs:
       - checkout
       - run: mvn clean package
       - run: |
-          echo “Running tests...”
+          echo "Running tests..."
           mvn test
-  
+jobs:
   #Job to perform Snyk scan
   snyk_scan:
     docker:
@@ -28,8 +29,9 @@ jobs:
       - run: docker build -t $IMAGE_NAME .
       - snyk/scan: 
           docker-image-name: $IMAGE_NAME
-  
-  # Job to build the Docker image and push to DockerHub
+
+Jobs:
+  #Job to build the Docker image and push to DockerHub
   docker_build_and_push:
     # executor: docker/docker
     docker:
@@ -47,22 +49,24 @@ jobs:
             
 
   # Deploy to Heroku
-  # deploy_to_heroku:
-  #   #executor: docker/docker
-  #   docker:
-  #     - image: cimg/openjdk:17.0.7
-  #   steps:
-  #     - checkout
-  #     - run: mvn clean package
-  #     - setup_remote_docker
-  #     - heroku/install
-  #     - run:
-  #         name: Heroku Container Push
-  #         command: |
-  #           heroku container:login
-  #           heroku container:push web -a harbour-booking-api
-  #           heroku container:release web -a harbour-booking-api
-  #
+deploy_to_heroku:
+  #executor: docker/docker
+  docker:
+    - image: cimg/openjdk:17.0.7
+  steps:
+    - checkout
+    - run: mvn clean package
+    - setup_remote_docker
+    - heroku/install
+    - run:
+        name: Login to Heroku Container Registry
+        command: heroku container:login
+    - run:
+        name: Heroku Container Push
+        command: |
+          heroku container:push web -a module04-project02
+          heroku container:release web -a module04-project02
+
 
 workflows:
   ci_flow:
@@ -78,15 +82,15 @@ workflows:
             branches:
               only: develop
 
-  # cicd_flow:
-  #   jobs:
-  #     - docker_build_and_push:
-  #         filters:
-  #           branches:
-  #             only: main
-      # # - deploy_to_heroku:
-      #     requires:
-      #       - docker_build_and_push
-      #     filters:
-      #       branches:
-      #         only: main
+  cicd_flow:
+    jobs:
+      - docker_build_and_push:
+          filters:
+            branches:
+              only: main
+      - deploy_to_heroku:
+          requires:
+            - docker_build_and_push
+          filters:
+            branches:
+              only: main

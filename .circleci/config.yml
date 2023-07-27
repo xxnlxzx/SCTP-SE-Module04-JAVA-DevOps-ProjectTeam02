@@ -3,9 +3,10 @@ orbs:
   docker: circleci/docker@2.2.0
   snyk: snyk/snyk@1.7.0
   heroku: circleci/heroku@2.0.0
+
 jobs:
-## Job to Build and Test ##
-build_and_test:
+  # Job to Build and Test
+  build_and_test:
     docker:
       - image: cimg/openjdk:17.0.7
     steps:
@@ -14,9 +15,9 @@ build_and_test:
       - run: |
           echo "Running tests..."
           mvn test
-  
-## Job to perform Snyk Scan ##
-snyk_scan:
+
+  # Job to perform Snyk scan
+  snyk_scan:
     docker:
       - image: cimg/openjdk:17.0.7
     environment:
@@ -27,12 +28,11 @@ snyk_scan:
       - setup_remote_docker
       - docker/check
       - run: docker build -t $IMAGE_NAME .
-      - snyk/scan: 
+      - snyk/scan:
           docker-image-name: $IMAGE_NAME
 
-  
-  #Job to build the Docker image and push to DockerHub
-docker_build_and_push:
+  # Job to build the Docker image and push to DockerHub
+  docker_build_and_push:
     # executor: docker/docker
     docker:
       - image: cimg/openjdk:17.0.7
@@ -46,27 +46,25 @@ docker_build_and_push:
             docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
             docker build -t ${DOCKER_LOGIN}/module04-project02:${CIRCLE_SHA1} .
             docker push ${DOCKER_LOGIN}/module04-project02:${CIRCLE_SHA1}
-            
 
   # Deploy to Heroku
-deploy_to_heroku:
-  #executor: docker/docker
-  docker:
-    - image: cimg/openjdk:17.0.7
-  steps:
-    - checkout
-    - run: mvn clean package
-    - setup_remote_docker
-    - heroku/install
-    - run:
-        name: Login to Heroku Container Registry
-        command: heroku container:login
-    - run:
-        name: Heroku - Container Push
-        command: |
-          heroku container:push web -a module04-project02
-          heroku container:release web -a module04-project02
-
+  deploy_to_heroku:
+    # executor: docker/docker
+    docker:
+      - image: cimg/openjdk:17.0.7
+    steps:
+      - checkout
+      - run: mvn clean package
+      - setup_remote_docker
+      - heroku/install
+      - run:
+          name: Login to Heroku Container Registry
+          command: heroku container:login
+      - run:
+          name: Heroku Container Push
+          command: |
+            heroku container:push web -a module04-project02
+            heroku container:release web -a module04-project02
 
 workflows:
   ci_flow:

@@ -1,94 +1,91 @@
 version: 2.1
 orbs:
   docker: circleci/docker@2.2.0
-  maven: circleci/maven@1.4.1
-  snyk: snyk/snyk@1.4.0
-  
-executors:
-  docker-executor:
+  snyk: snyk/snyk@1.7.0
+  # heroku: circleci/heroku@2.0.0
+jobs:
+  build_and_test:
     docker:
       - image: cimg/openjdk:17.0.7
-
-jobs:
-  ci:
-    executor: docker-executor
     steps:
       - checkout
-
-      # Restore dependencies
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "pom.xml" }}
-
-      # Install dependencies
-      - run:
-          name: Install Dependencies
-          command: mvn dependency:go-offline
-
-      # Save dependencies for future runs
-      - save_cache:
-          paths:
-            - ~/.m2
-          key: v1-dependencies-{{ checksum "pom.xml" }}
-
-      # Run Maven tests
-      - run:
-          name: Run Maven Test
-          command: mvn test
-
-      # Run Snyk security scan
-      - run:
-          name: Snyk Security Scan
-          command: snyk test
-
-  cd:
-    executor: docker-executor
+      - run: mvn clean package
+      - run: |
+          echo “Running tests...”
+          mvn test
+  
+  #Job to perform Snyk scan
+  snyk_scan:
+    docker:
+      - image: cimg/openjdk:17.0.7
+    environment:
+      IMAGE_NAME: xxnlxzx/sctp-se-module04-java-devops-projectteam02 # Use lowercase repository name
     steps:
       - checkout
-
-      # Install Docker for building and pushing the Docker image
+      - run: mvn clean package
       - setup_remote_docker
-
-      # Build the Docker image with semantic control tags
+      - docker/check
+      - run: docker build -t $IMAGE_NAME .
+      - snyk/scan: 
+          docker-image-name: $IMAGE_NAME
+  
+  # Job to build the Docker image and push to DockerHub
+  docker_build_and_push:
+    # executor: docker/docker
+    docker:
+      - image: cimg/openjdk:17.0.7
+    steps:
+      - checkout
+      - run: mvn clean package
+      - setup_remote_docker
       - run:
-          name: Build Docker Image
+          name: Build and Push Docker Image
           command: |
-            docker build -t module04-project02:${CIRCLE_SHA1} -t module04-project02:latest .
+            docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
+            docker build -t ${DOCKER_LOGIN}/module04-project02:${CIRCLE_SHA1} .
+            docker push ${DOCKER_LOGIN}/module04-project02:${CIRCLE_SHA1}
+            
 
-      # Push the Docker image to a container registry (e.g., Docker Hub)
-      - run:
-          name: Push Docker Image
-          command: |
-            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-            docker push module04-project02:${CIRCLE_SHA1}
-            docker push module04-project02:latest
-
-  test_functionality_1:
-    executor: docker-executor
-    steps:
-      - checkout
-      # Add steps for testing functionality 1
-
-  test_functionality_2:
-    executor: docker-executor
-    steps:
-      - checkout
-      # Add steps for testing functionality 2
-
-  test_functionality_3:
-    executor: docker-executor
-    steps:
-      - checkout
-      # Add steps for testing functionality 3
+  # Deploy to Heroku
+  # deploy_to_heroku:
+  #   #executor: docker/docker
+  #   docker:
+  #     - image: cimg/openjdk:17.0.7
+  #   steps:
+  #     - checkout
+  #     - run: mvn clean package
+  #     - setup_remote_docker
+  #     - heroku/install
+  #     - run:
+  #         name: Heroku Container Push
+  #         command: |
+  #           heroku container:login
+  #           heroku container:push web -a harbour-booking-api
+  #           heroku container:release web -a harbour-booking-api
 
 workflows:
-  version: 2
-  ci_cd:
+  ci_flow:
     jobs:
-      - ci
-      - cd:
-          requires:
-            - ci
+      - build_and_test:
           filters:
             branches:
-              only: release
+              only: develop
+      - snyk_scan:
+          requires:
+            - build_and_test
+          filters:
+            branches:
+              only: develop
+
+  # cicd_flow:
+  #   jobs:
+  #     - docker_build_and_push:
+  #         filters:
+  #           branches:
+  #             only: main
+      # # - deploy_to_heroku:
+      #     requires:
+      #       - docker_build_and_push
+      #     filters:
+      #       branches:
+      #         only: main

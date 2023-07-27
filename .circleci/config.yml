@@ -4,7 +4,7 @@ orbs:
   snyk: snyk/snyk@1.7.0
   heroku: circleci/heroku@2.0.0
 jobs:
-  #Job to Build and Test
+## Job to Build and Test ##
 build_and_test:
     docker:
       - image: cimg/openjdk:17.0.7
@@ -15,7 +15,7 @@ build_and_test:
           echo "Running tests..."
           mvn test
   
-  #Job to perform Snyk scan
+## Job to perform Snyk Scan ##
 snyk_scan:
     docker:
       - image: cimg/openjdk:17.0.7
@@ -62,7 +62,7 @@ deploy_to_heroku:
         name: Login to Heroku Container Registry
         command: heroku container:login
     - run:
-        name: Heroku Container Push
+        name: Heroku - Container Push
         command: |
           heroku container:push web -a module04-project02
           heroku container:release web -a module04-project02

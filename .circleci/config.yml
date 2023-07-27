@@ -3,15 +3,10 @@ orbs:
   docker: circleci/docker@2.2.0
   maven: circleci/maven@1.4.1
   snyk: snyk/snyk@1.7.0
-
 jobs:
   build_and_test:
     docker:
       - image: cimg/openjdk:17.0.7
-        environment:
-          NODE_VERSION: "14"  # Specify the Node.js version
-      - image: cimg/node:14.18  # Add Node.js 14.x image
-
     steps:
       - checkout
       - run: mvn clean package

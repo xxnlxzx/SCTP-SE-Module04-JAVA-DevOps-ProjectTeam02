@@ -3,49 +3,17 @@ orbs:
   docker: circleci/docker@2.2.0
   maven: circleci/maven@1.4.1
   snyk: snyk/snyk@1.7.0
+
 jobs:
   build_and_test:
-      docker:
-        - image: cimg/openjdk:17.0.7
-      steps:
-        - checkout
-        - run: mvn clean package
-        - run: |
-            echo “Running tests...”
-            mvn test
-
-    executor: docker-executor
+    docker:
+      - image: cimg/openjdk:17.0.7
     steps:
-      # 1. Spin up environment
       - checkout
-
-      # 2. Spin up container environment
-      - setup_remote_docker
-
-      # 3. Preparing environment variables (if needed)
-
-      # 4. Checkout code
-      - attach_workspace:
-          at: /home/circleci/project/target  # Adjust this path based on your project structure
-
-      # 5. Restore and cache Maven dependencies
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "pom.xml" }}-{{ checksum "pom.xml" }}
-      - run:
-          name: Install Dependencies
-          command: mvn dependency:go-offline
-      - save_cache:
-          paths:
-            - ~/.m2
-          key: v1-dependencies-{{ checksum "pom.xml" }}-{{ checksum "pom.xml" }}
-
-      # 6. Install Snyk CLI and test Docker image
-      - run: npm install -g snyk
       - run: mvn clean package
-      - docker/check
-      - run: docker build -t $IMAGE_NAME .
-      - run: snyk test --docker $IMAGE_NAME --severity-threshold=low
+      - run:
+          name: Running tests...
+          command: mvn test
 
   cicd_flow:
     executor: docker-executor
@@ -86,10 +54,10 @@ workflows:
   version: 2
   cicd_flow:
     jobs:
-      - ci_flow
+      - build_and_test
       - cicd_flow:
           requires:
-            - ci_flow
+            - build_and_test
           filters:
             branches:
               only: develop

@@ -82,6 +82,8 @@ workflows:
 
   cicd_flow:
     jobs:
+        requires:
+          - build_and_test
       - docker_build_and_push:
           filters:
             branches:

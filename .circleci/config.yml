@@ -79,9 +79,8 @@ workflows:
           filters:
             branches:
               only: develop
-      continue_on_fail: true
 
-  cicd_flow:
+cicd_flow:
     jobs:
       - docker_build_and_push:
           filters:
@@ -93,4 +92,5 @@ workflows:
           filters:
             branches:
               only: main
-    # continue_on_fail: true
+
+      continue_on_fail: true

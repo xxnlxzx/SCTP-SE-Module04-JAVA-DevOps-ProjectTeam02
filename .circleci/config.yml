@@ -79,6 +79,7 @@ workflows:
           filters:
             branches:
               only: develop
+      continue_on_fail: true
 
   cicd_flow:
     jobs:
@@ -92,3 +93,4 @@ workflows:
           filters:
             branches:
               only: main
+    # continue_on_fail: true

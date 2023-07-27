@@ -47,22 +47,26 @@ jobs:
             
 
   # Deploy to Heroku
-  deploy_to_heroku:
-    #executor: docker/docker
-    docker:
-      - image: cimg/openjdk:17.0.7
-    steps:
-      - checkout
-      - run: mvn clean package
-      - setup_remote_docker
-      - heroku/install
-      - run:
-          name: Heroku Container Push
-          command: |
-            heroku container:login
-            heroku container:push web -a module04-project02
-            heroku container:release web -a module04-project02
-  #
+deploy_to_heroku:
+  #executor: docker/docker
+  docker:
+    - image: cimg/openjdk:17.0.7
+  steps:
+    - checkout
+    - run: mvn clean package
+    - setup_remote_docker
+    - heroku/install
+    - run:
+        name: Login to Heroku Container Registry
+        command: heroku container:login
+          environment:
+            HEROKU_API_KEY: $HEROKU_API_KEY
+    - run:
+        name: Heroku Container Push
+        command: |
+          heroku container:push web -a module04-project02
+          heroku container:release web -a module04-project02
+
 
 workflows:
   ci_flow:

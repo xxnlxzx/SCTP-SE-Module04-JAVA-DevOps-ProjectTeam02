@@ -93,4 +93,72 @@ workflows:
             branches:
               only: main
 
-      continue_on_fail: true
+workflows:
+  ci_flow:
+    jobs:
+      - build_and_test:
+          filters:
+            branches:
+              only: develop
+      - snyk_scan:
+          requires:
+            - build_and_test
+          filters:
+            branches:
+              only: develop
+
+workflows:
+  ci_flow:
+    jobs:
+      - build_and_test:
+          filters:
+            branches:
+              only: develop
+      - snyk_scan:
+          requires:
+            - build_and_test
+          filters:
+            branches:
+              only: develop
+
+  cicd_flow:
+    jobs:
+      - docker_build_and_push:
+          filters:
+            branches:
+              only: main
+      - deploy_to_heroku:
+          requires:
+            - docker_build_and_push
+          filters:
+            branches:
+              only: main
+
+workflows:
+  ci_flow:
+    jobs:
+      - build_and_test:
+          filters:
+            branches:
+              only: develop
+      - snyk_scan:
+          requires:
+            - build_and_test
+          filters:
+            branches:
+              only: develop
+
+  cicd_flow:
+    jobs:
+      - docker_build_and_push:
+          filters:
+            branches:
+              only: main
+      - deploy_to_heroku:
+          requires:
+            - docker_build_and_push
+          filters:
+            branches:
+              only: main
+
+      continue-on-fail: true

@@ -46,7 +46,7 @@ jobs:
             docker push ${DOCKER_LOGIN}/module04-project02:${CIRCLE_SHA1}
             
 
-  # # Deploy to Heroku
+  # Deploy to Heroku
   # deploy_to_heroku:
   #   #executor: docker/docker
   #   docker:
@@ -83,11 +83,11 @@ workflows:
           filters:
             branches:
               only: main
-      - deploy_to_heroku:
-          requires:
-            - docker_build_and_push
-          filters:
-            branches:
-              only: main
+      # # - deploy_to_heroku:
+      #     requires:
+      #       - docker_build_and_push
+      #     filters:
+      #       branches:
+      #         only: main
 
          

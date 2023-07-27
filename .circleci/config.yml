@@ -19,7 +19,7 @@ jobs:
     docker:
       - image: cimg/openjdk:17.0.7
     environment:
-      IMAGE_NAME: xxnlxzx/SCTP-SE-Module04-JAVA-DevOps-ProjectTeam02
+      IMAGE_NAME: xxnlxzx/sctp-se-module04-java-devops-projectteam02 # Use lowercase repository name
     steps:
       - checkout
       - run: mvn clean package
@@ -29,7 +29,7 @@ jobs:
       - snyk/scan: 
           docker-image-name: $IMAGE_NAME
   
-  # Job to build the Docker iamge and push to DockerHub
+  # Job to build the Docker image and push to DockerHub
   docker_build_and_push:
     # executor: docker/docker
     docker:
@@ -89,5 +89,3 @@ workflows:
       #     filters:
       #       branches:
       #         only: main
-
-         

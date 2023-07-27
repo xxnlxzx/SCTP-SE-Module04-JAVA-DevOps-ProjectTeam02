@@ -85,10 +85,10 @@ workflows:
       - docker_build_and_push:
           filters:
             branches:
-              only: main
+              only: develop
       - deploy_to_heroku:
           requires:
             - docker_build_and_push
           filters:
             branches:
-              only: main
+              only: develop

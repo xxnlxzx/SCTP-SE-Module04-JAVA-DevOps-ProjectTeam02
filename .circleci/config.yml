@@ -74,6 +74,7 @@ workflows:
             branches:
               only: develop
       - snyk_scan:
+          continue_on_fail: true
           requires:
             - build_and_test
           filters:
@@ -93,4 +94,4 @@ cicd_flow:
             branches:
               only: main
 
-    continue_on_fail: true
+

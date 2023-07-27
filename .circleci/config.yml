@@ -121,17 +121,17 @@ workflows:
             branches:
               only: develop
 
-    cicd_flow:
-      jobs:
-        - docker_build_and_push:
-            filters:
-              branches:
-                only: main
-        - deploy_to_heroku:
-            requires:
-              - docker_build_and_push
-            filters:
-              branches:
-                only: main
-  
-        continue_on_fail: true
+  cicd_flow:
+    jobs:
+      - docker_build_and_push:
+          filters:
+            branches:
+              only: main
+      - deploy_to_heroku:
+          requires:
+            - docker_build_and_push
+          filters:
+            branches:
+              only: main
+
+      continue_on_fail: true

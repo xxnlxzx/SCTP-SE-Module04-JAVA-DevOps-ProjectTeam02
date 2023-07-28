@@ -85,13 +85,13 @@ workflows:
       - build_and_test:
           filters:
             branches:
-              only: develop
+              only: main
       - snyk_scan:
           requires:
             - build_and_test
           filters:
             branches:
-              only: develop
+              only: main
 
   cicd_flow:
     jobs:

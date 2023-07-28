@@ -104,4 +104,4 @@ workflows:
             - docker_build_and_push
           filters:
             branches:
-              only: release
+              only: main
